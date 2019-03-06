@@ -9,6 +9,9 @@ import scala.Tuple2;
 import upf.edu.lsds2018.lab4.model.SimplifiedTweet;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,24 +41,36 @@ public class TwitterBroadcastWithResource {
         JavaRDD<SimplifiedTweet> tweets = stringRDD.map(t -> SimplifiedTweet.fromJson(t).orElse(null)).filter(t -> t != null);
 
         // Retrieve and use the broadcasted map
-        final JavaPairRDD<String, Integer> countByLanguage = tweets.mapToPair(t->{
+        final JavaPairRDD<Integer, String> countByLanguage = tweets.mapToPair(t->{
         	HashMap<String, String> lMap = bcastMap.getValue();
         	return new Tuple2<String, Integer>(lMap.getOrDefault(t.getLang(), "Undetermined"), 1);
-        }).reduceByKey((x, y)->x+y).mapToPair(p->new Tuple2<String, Integer>(p._1, p._2));
+        }).reduceByKey((x, y)->x+y).mapToPair(p->new Tuple2<Integer, String>(p._2, p._1));
 
         // Report the following three outputs into a section of the README.md
-        final JavaPairRDD<String, Integer> countByLanguageTop10 = sparkContext.parallelizePairs(countByLanguage.sortByKey(false).take(10));
-        final JavaPairRDD<String, Integer> countByLanguageBottom10 = sparkContext.parallelizePairs(countByLanguage.sortByKey(true).take(10));
+        final JavaPairRDD<Integer, String> countByLanguageTop10 = sparkContext.parallelizePairs(countByLanguage.sortByKey(false).take(10));
+        final JavaPairRDD<Integer, String> countByLanguageBottom10 = sparkContext.parallelizePairs(countByLanguage.sortByKey(true).take(10));
         
-        long undetermined = countByLanguage.filter(t->"Undetermined".contentEquals(t._1)).first()._2;
-        long languages = countByLanguage.map(t->t._2).reduce((x,y)->x+y).longValue();
+        long undetermined = countByLanguage.filter(t->"Undetermined".contentEquals(t._2)).first()._1;
+        long languages = countByLanguage.map(t->t._1).reduce((x,y)->x+y).longValue();
         double r = (1.0 * undetermined) / (1.0 * languages);
         
-        System.out.println("Ratio of undetermined/unknown tweets: " + r);
+        String ratio = "Ratio of undetermined/unknown tweets: " + r;        
+        System.out.println(ratio);
 
         countByLanguage.saveAsTextFile(outputDir + "/all");
         countByLanguageTop10.saveAsTextFile(outputDir + "/top10");
         countByLanguageBottom10.saveAsTextFile(outputDir + "/bottom10");
+        
+        try 
+        {
+        	BufferedWriter writer = new BufferedWriter(new FileWriter(outputDir + "/ratio.txt"));
+			writer.write(ratio);
+			writer.close();
+		} 
+        catch (IOException e) 
+        {
+			e.printStackTrace();
+		}
         
         sparkContext.close();
     }
