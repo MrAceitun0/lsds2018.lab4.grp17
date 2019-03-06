@@ -28,7 +28,7 @@ public class TwitterAccumulators {
         // Load input
         JavaRDD<String> stringRDD = sparkContext.textFile(inputDir);
 
-        JavaRDD<SimplifiedTweet> tweets = // LOAD and USE ACCUMULATORS to provide the following printouts
+        //JavaRDD<SimplifiedTweet> tweets = // LOAD and USE ACCUMULATORS to provide the following printouts
 
         System.out.println("# Total tweets: "); // TODO
         System.out.println("# Parsing attempts: "); // TODO
