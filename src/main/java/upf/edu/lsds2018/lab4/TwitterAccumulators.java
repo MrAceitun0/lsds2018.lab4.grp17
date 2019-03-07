@@ -15,25 +15,49 @@ public class TwitterAccumulators {
 
     public static void main(String[] args) {
         String inputDir = args[0];
-        String outputDir = args[1];
 
         //Create a SparkContext to initialize
         SparkConf conf = new SparkConf().setAppName("Twitter Accumulators");
 
         JavaSparkContext sparkContext = new JavaSparkContext(conf);
-
+        SparkContext sc = sparkContext.sc();
+        
         // Create accumulators
-        // TODO
-
+        CollectionAccumulator<String> errorTweets = sc.collectionAccumulator("goodTweets");
+        
         // Load input
-        JavaRDD<String> stringRDD = sparkContext.textFile(inputDir);
-
-        //JavaRDD<SimplifiedTweet> tweets = // LOAD and USE ACCUMULATORS to provide the following printouts
-
-        System.out.println("# Total tweets: "); // TODO
-        System.out.println("# Parsing attempts: "); // TODO
-        System.out.println("# Failed attempts: "); // TODO
-        System.out.println("Erroring Tweets content:"); // TODO
+        JavaRDD<String> stringRDD = sparkContext.textFile(inputDir).filter(x -> !x.isEmpty());
+        //stringRDD.foreach(i -> System.out.println(i));
+        
+        JavaRDD<SimplifiedTweet> tweets = stringRDD.map(t ->{
+        	Optional<SimplifiedTweet> st = SimplifiedTweet.fromJson(t);
+        	
+            if(st.equals(Optional.empty())){
+            	errorTweets.add(t);
+            	return null;
+            }
+            else {
+            	return st.get();
+            }
+            
+        }).filter(t -> t != null);
+        
+        System.out.println("# Total tweets: " + tweets.count()); 
+        
+        long parsingAttempts = tweets.count() + errorTweets.value().size();
+        System.out.println("# Parsing attempts: " + parsingAttempts); 
+        
+        System.out.println("# Failed attempts: " + errorTweets.value().size()); 
+        
+        System.out.println("Erroring Tweets content:"); 
+        
+        for(int i = 0; i < 15; i++)//Print 15 error tweets content
+        {
+        	System.out.println(errorTweets.value().get(i));
+        	System.out.println("\n");
+        }
+        
+        sparkContext.close();
     }
 }
 
