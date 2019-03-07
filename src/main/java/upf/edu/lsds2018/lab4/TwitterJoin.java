@@ -36,23 +36,18 @@ public class TwitterJoin {
 
         // Check it you can get the same output as the previous step
         final JavaPairRDD<Integer, String> countByLanguage = tweets.mapToPair(s -> new Tuple2<>(s.getLang(), 1))
-                .reduceByKey((x,y)->x+y).leftOuterJoin(mapISO639toLanguage).mapToPair(t->{
-                    if(t._2._2.isPresent()) {
-                        return new Tuple2<>(t._2._2.get(), t._2._1);
-                    }
-                    else {
-                        return new Tuple2<>("Undetermined", t._2._1);
-                    }
-                }).reduceByKey((x,y)->x+y).mapToPair(t->new Tuple2<Integer,String>(t._2,t._1));
+                .reduceByKey((x,y)->x+y).leftOuterJoin(mapISO639toLanguage).mapToPair(s->{
+                    if(s._2._2.isPresent()) return new Tuple2<>(s._2._2.get(), s._2._1);
+                    else return new Tuple2<>("Undetermined", s._2._1);
+                }).reduceByKey((x,y)->x+y).mapToPair(s->new Tuple2<>(s._2 , s._1));
 
         final JavaPairRDD<Integer, String> countByLanguageTop10 = sparkContext.parallelizePairs(countByLanguage.sortByKey(false).take(10));
         final JavaPairRDD<Integer, String> countByLanguageBottom10 = sparkContext.parallelizePairs(countByLanguage.sortByKey(true).take(10));
 
-        long undetermined = countByLanguage.filter(t-> "Undetermined".equals(t._2)).first()._1;
-        long allLanguages = countByLanguage.map(t->t._1).reduce((x,y)->x+y).longValue();
-        double ratio = (1.0*undetermined) / (1.0*allLanguages);
+        long undetermined = countByLanguage.filter(s-> "Undetermined".equals(s._2)).first()._1;
+        long allLanguages = countByLanguage.map(s->s._1).reduce((x,y)->x+y).longValue();
 
-        System.out.println("Ratio of undetermined tweets: " + ratio);
+        System.out.println("Ratio of undetermined tweets: " + (1.0*undetermined) / (1.0*allLanguages));
 
         // Save the map as RDD
         mapISO639toLanguage.saveAsTextFile(outputDir + "/map");

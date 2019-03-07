@@ -17,9 +17,11 @@ import java.util.Optional;
 
 public class TwitterAccumulators {
 
+    private static Long checkErrors(Long numErrors) {
+        return numErrors>15 ? 15 : numErrors;
+    }
     public static void main(String[] args) throws IOException {
         String inputDir = args[0];
-        String outDir = args[1];
         
         //Create a SparkContext to initialize
         SparkConf conf = new SparkConf().setAppName("Twitter Accumulators");
@@ -59,7 +61,9 @@ public class TwitterAccumulators {
         System.out.println("Erroring Tweets content:"); 
         
         List<String> errorTweetsString = errorTweets.value();
-        for(int i = 0; i < countErrorsValue; i++)//Print 15 error tweets content
+
+
+        for(int i = 0; i < checkErrors(countErrorsValue); i++)//Print 15 error tweets content
         {
         	System.out.println(errorTweetsString.get(i));
         	System.out.println("\n");
@@ -71,7 +75,8 @@ public class TwitterAccumulators {
 			writer.write("# Parsing attempts: " + (tweets.count() + countErrorsValue)+"\n");
 			writer.write("# Failed attempts: " + countErrorsValue+"\n");
 			writer.write("Erroring Tweets content:\n");
-			for(int i = 0; i < countErrorsValue; i++)//Print 15 error tweets content
+
+			for(int i = 0; i < checkErrors(countErrorsValue); i++)//Print 15 error tweets content
 	        {
 				writer.write(errorTweetsString.get(i)+"\n");
 	        }
