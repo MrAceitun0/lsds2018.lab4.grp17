@@ -9,13 +9,18 @@ import org.apache.spark.util.DoubleAccumulator;
 import org.apache.spark.util.LongAccumulator;
 import upf.edu.lsds2018.lab4.model.SimplifiedTweet;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 public class TwitterAccumulators {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String inputDir = args[0];
-
+        String outDir = args[1];
+        
         //Create a SparkContext to initialize
         SparkConf conf = new SparkConf().setAppName("Twitter Accumulators");
 
@@ -24,6 +29,7 @@ public class TwitterAccumulators {
         
         // Create accumulators
         CollectionAccumulator<String> errorTweets = sc.collectionAccumulator("goodTweets");
+        LongAccumulator countErrors = sc.longAccumulator("countErrors");
         
         // Load input
         JavaRDD<String> stringRDD = sparkContext.textFile(inputDir).filter(x -> !x.isEmpty());
@@ -34,6 +40,7 @@ public class TwitterAccumulators {
         	
             if(st.equals(Optional.empty())){
             	errorTweets.add(t);
+            	countErrors.add(1);
             	return null;
             }
             else {
@@ -44,18 +51,36 @@ public class TwitterAccumulators {
         
         System.out.println("# Total tweets: " + tweets.count()); 
         
-        long parsingAttempts = tweets.count() + errorTweets.value().size();
-        System.out.println("# Parsing attempts: " + parsingAttempts); 
+        Long countErrorsValue = countErrors.value();
+        System.out.println("# Parsing attempts: " + (tweets.count() + countErrorsValue)); 
         
-        System.out.println("# Failed attempts: " + errorTweets.value().size()); 
+        System.out.println("# Failed attempts: " + countErrorsValue); 
         
         System.out.println("Erroring Tweets content:"); 
         
-        for(int i = 0; i < 15; i++)//Print 15 error tweets content
+        List<String> errorTweetsString = errorTweets.value();
+        for(int i = 0; i < countErrorsValue; i++)//Print 15 error tweets content
         {
-        	System.out.println(errorTweets.value().get(i));
+        	System.out.println(errorTweetsString.get(i));
         	System.out.println("\n");
         }
+        
+        BufferedWriter writer = new BufferedWriter(new FileWriter("../outAccumulators/info.txt"));
+        try {
+			writer.write("# Total tweets: " + tweets.count()+"\n");
+			writer.write("# Parsing attempts: " + (tweets.count() + countErrorsValue)+"\n");
+			writer.write("# Failed attempts: " + countErrorsValue+"\n");
+			writer.write("Erroring Tweets content:\n");
+			for(int i = 0; i < countErrorsValue; i++)//Print 15 error tweets content
+	        {
+				writer.write(errorTweetsString.get(i)+"\n");
+	        }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
+        writer.close();
         
         sparkContext.close();
     }

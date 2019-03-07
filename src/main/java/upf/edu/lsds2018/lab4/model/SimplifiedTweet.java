@@ -88,86 +88,93 @@ public class SimplifiedTweet implements Serializable {
      * @return an {@link Optional} of a {@link SimplifiedTweet}
      */
     public static Optional<SimplifiedTweet> fromJson(String jsonStr) {
-        JsonElement je = parser.parse(jsonStr);
-        JsonObject jo = je.getAsJsonObject();
+    	try {
+    		JsonElement je = parser.parse(jsonStr);
+            JsonObject jo = je.getAsJsonObject();
 
-        // initialize variables
-        long tweetId = 0L;
-        String text = null;
-        long userId = 0L;
-        String userName = null;
-        long followersCount = 0L;
-        long timestampMs = 0L;
-        boolean isRetweeted = false;
-        Long retweetedUserId = 0L;
-        String retweetedUserName = null;
-        String lang = null;
+            // initialize variables
+            long tweetId = 0L;
+            String text = null;
+            long userId = 0L;
+            String userName = null;
+            long followersCount = 0L;
+            long timestampMs = 0L;
+            boolean isRetweeted = false;
+            Long retweetedUserId = 0L;
+            String retweetedUserName = null;
+            String lang = null;
 
-        if (jo.has("id")) {
-            tweetId = jo.get("id").getAsLong();
-        } else {
-            return Optional.empty();
-        }
-
-        if (jo.has("text")) {
-            text = jo.get("text").getAsString();
-            System.out.println(text);
-        }
-
-        if (jo.has("user")) {
-            JsonObject userObj = jo.get("user").getAsJsonObject(); // cast method
-            if (userObj.has("id")) {
-                userId = userObj.get("id").getAsLong();
+            if (jo.has("id")) {
+                tweetId = jo.get("id").getAsLong();
             } else {
                 return Optional.empty();
             }
-            if (userObj.has("name")) {
-                userName = userObj.get("name").getAsString();
-            }
-            if (userObj.has("followers_count")) {
-                followersCount = userObj.get("followers_count").getAsLong();
-            } else {
-                return Optional.empty();
-            }
-        } else {
-            return Optional.empty();
-        }
-        
-        if (jo.has("timestamp_ms")) {
-            timestampMs = jo.get("timestamp_ms").getAsLong();
-        } else {
-            return Optional.empty();
-        }
 
-        if (jo.has("retweeted_status")) {
-            isRetweeted = true;
-            JsonObject retweetObj = jo.get("retweeted_status").getAsJsonObject();
-            if (retweetObj.has("user")) {
-                JsonObject retweetUserObj = retweetObj.get("user").getAsJsonObject();
-                if (retweetUserObj.has("id")) {
-                	if(!retweetUserObj.get("id").isJsonNull())
-                	{
-                		retweetedUserId = retweetUserObj.get("id").getAsLong();
-                	}      
+            if (jo.has("text")) {
+                text = jo.get("text").getAsString();
+                System.out.println(text);
+            }
+
+            if (jo.has("user")) {
+                JsonObject userObj = jo.get("user").getAsJsonObject(); // cast method
+                if (userObj.has("id")) {
+                    userId = userObj.get("id").getAsLong();
+                } else {
+                    return Optional.empty();
                 }
-                else {
-                	return Optional.empty();
+                if (userObj.has("name")) {
+                    userName = userObj.get("name").getAsString();
                 }
-                                
-                if (retweetUserObj.has("name")) {
-                    retweetedUserName = retweetUserObj.get("name").getAsString();
-                } 
+                if (userObj.has("followers_count")) {
+                    followersCount = userObj.get("followers_count").getAsLong();
+                } else {
+                    return Optional.empty();
+                }
             } else {
                 return Optional.empty();
             }
-        }
+            
+            if (jo.has("timestamp_ms")) {
+                timestampMs = jo.get("timestamp_ms").getAsLong();
+            } else {
+                return Optional.empty();
+            }
+
+            if (jo.has("retweeted_status")) {
+                isRetweeted = true;
+                JsonObject retweetObj = jo.get("retweeted_status").getAsJsonObject();
+                if (retweetObj.has("user")) {
+                    JsonObject retweetUserObj = retweetObj.get("user").getAsJsonObject();
+                    if (retweetUserObj.has("id")) {
+                    	if(!retweetUserObj.get("id").isJsonNull())
+                    	{
+                    		retweetedUserId = retweetUserObj.get("id").getAsLong();
+                    	}      
+                    }
+                    else {
+                    	return Optional.empty();
+                    }
+                                    
+                    if (retweetUserObj.has("name")) {
+                        retweetedUserName = retweetUserObj.get("name").getAsString();
+                    } 
+                } else {
+                    return Optional.empty();
+                }
+            }
+            
+            if (jo.has("lang")) {
+                lang = jo.get("lang").getAsString();
+            }
+            
+            return Optional.of(new SimplifiedTweet(tweetId, text, userId, userName, followersCount, isRetweeted,
+                    retweetedUserId, retweetedUserName, timestampMs, lang));
+    	}
+    	catch (Exception e){
+    		e.printStackTrace();
+    		return null;
+    	}
         
-        if (jo.has("lang")) {
-            lang = jo.get("lang").getAsString();
-        }
-        
-        return Optional.of(new SimplifiedTweet(tweetId, text, userId, userName, followersCount, isRetweeted,
-                retweetedUserId, retweetedUserName, timestampMs, lang));
     }
 
     @Override
