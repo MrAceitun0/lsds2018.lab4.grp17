@@ -1,0 +1,19 @@
+# Total tweets: 1217479
+# Parsing attempts: 1291668
+# Failed attempts: 74189
+Erroring Tweets content:
+{"limit":{"track":1,"timestamp_ms":"1526148056161"}}
+{"limit":{"track":1,"timestamp_ms":"1526149086920"}}
+{"limit":{"track":1,"timestamp_ms":"1526150506242"}}
+{"limit":{"track":2,"timestamp_ms":"1526150538989"}}
+{"limit":{"track":1,"timestamp_ms":"1526150665107"}}
+{"limit":{"track":4,"timestamp_ms":"1526150719217"}}
+{"limit":{"track":5,"timestamp_ms":"1526150881065"}}
+{"limit":{"track":1,"timestamp_ms":"1526151003951"}}
+{"limit":{"track":3,"timestamp_ms":"1526151004881"}}
+{"limit":{"track":6,"timestamp_ms":"1526151007256"}}
+{"limit":{"track":5,"timestamp_ms":"1526151009858"}}
+{"limit":{"track":6,"timestamp_ms":"1526151023106"}}
+{"limit":{"track":3,"timestamp_ms":"1526151023945"}}
+{"limit":{"track":6,"timestamp_ms":"1526151027337"}}
+{"limit":{"track":4,"timestamp_ms":"1526151050991"}}
