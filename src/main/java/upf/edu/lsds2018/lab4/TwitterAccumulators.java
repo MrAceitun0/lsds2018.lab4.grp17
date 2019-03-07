@@ -5,7 +5,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.SparkConf;
 import org.apache.spark.util.CollectionAccumulator;
-import org.apache.spark.util.DoubleAccumulator;
 import org.apache.spark.util.LongAccumulator;
 import upf.edu.lsds2018.lab4.model.SimplifiedTweet;
 
@@ -17,9 +16,6 @@ import java.util.Optional;
 
 public class TwitterAccumulators {
 
-    private static Long checkErrors(Long numErrors) {
-        return numErrors>15 ? 15 : numErrors;
-    }
     public static void main(String[] args) throws IOException {
         String inputDir = args[0];
         
@@ -61,9 +57,18 @@ public class TwitterAccumulators {
         System.out.println("Erroring Tweets content:"); 
         
         List<String> errorTweetsString = errorTweets.value();
-
-
-        for(int i = 0; i < checkErrors(countErrorsValue); i++)//Print 15 error tweets content
+        
+        int x;
+        if(countErrorsValue > 15)
+        {
+            x = 15;
+        }
+        else
+        {
+            x = countErrorsValue.intValue();
+        }
+        
+        for(int i = 0; i < x; i++)//Print x error tweets content
         {
         	System.out.println(errorTweetsString.get(i));
         	System.out.println("\n");
@@ -75,8 +80,7 @@ public class TwitterAccumulators {
 			writer.write("# Parsing attempts: " + (tweets.count() + countErrorsValue)+"\n");
 			writer.write("# Failed attempts: " + countErrorsValue+"\n");
 			writer.write("Erroring Tweets content:\n");
-
-			for(int i = 0; i < checkErrors(countErrorsValue); i++)//Print 15 error tweets content
+			for(int i = 0; i < x; i++)//Print x error tweets content
 	        {
 				writer.write(errorTweetsString.get(i)+"\n");
 	        }

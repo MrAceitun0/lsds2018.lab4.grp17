@@ -9,7 +9,6 @@ import upf.edu.lsds2018.lab4.model.SimplifiedTweet;
 
 import java.util.Objects;
 
-
 public class TwitterJoin {
 
     public static void main(String[] args) {
@@ -54,6 +53,8 @@ public class TwitterJoin {
         countByLanguage.saveAsTextFile(outputDir + "/joined");
         countByLanguageTop10.saveAsTextFile(outputDir + "/top10");
         countByLanguageBottom10.saveAsTextFile(outputDir + "/bottom10");
+        
+        sparkContext.close();
     }
 
 }

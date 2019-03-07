@@ -1,18 +1,10 @@
 package upf.edu.lsds2018.lab4.model;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import java.io.Serializable;
 import java.util.Optional;
 
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Optional;
 import java.util.Scanner;
 
 import static org.junit.Assert.*;
@@ -100,7 +92,6 @@ public class SimplifiedTweetTest {
 			String line = scan.nextLine();
 	    	
 	    	Optional<SimplifiedTweet> st = SimplifiedTweet.fromJson(line);
-	    	System.out.println(st.toString());
 	    	sTweet = st.get();
 	    	
 	    	assertEquals("Tweet is not as expected", sTweet.getText(), null);

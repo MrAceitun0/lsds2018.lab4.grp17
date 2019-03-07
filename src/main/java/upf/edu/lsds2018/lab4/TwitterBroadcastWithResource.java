@@ -8,13 +8,7 @@ import org.apache.spark.broadcast.Broadcast;
 import scala.Tuple2;
 import upf.edu.lsds2018.lab4.model.SimplifiedTweet;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
