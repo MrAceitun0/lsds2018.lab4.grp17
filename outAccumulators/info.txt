@@ -1,6 +1,0 @@
-# Total tweets: 49
-# Parsing attempts: 51
-# Failed attempts: 2
-Erroring Tweets content:
-{"limit":{"track":28,"timestamp_ms":"1526165945836"}}
-{"limit":{"track":10,"timestamp_ms":"1526165945836"}}

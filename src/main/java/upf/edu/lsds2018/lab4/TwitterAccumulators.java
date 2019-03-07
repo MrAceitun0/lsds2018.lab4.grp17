@@ -59,7 +59,7 @@ public class TwitterAccumulators {
         List<String> errorTweetsString = errorTweets.value();
         
         int x;
-        if(countErrorsValue > 15)
+        if(countErrorsValue > 15) //For the case that count errors values is less than 15
         {
             x = 15;
         }

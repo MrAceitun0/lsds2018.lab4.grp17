@@ -112,7 +112,7 @@ public class SimplifiedTweet implements Serializable {
 
             if (jo.has("text")) {
                 text = jo.get("text").getAsString();
-                System.out.println(text);
+                //System.out.println(text);
             }
 
             if (jo.has("user")) {

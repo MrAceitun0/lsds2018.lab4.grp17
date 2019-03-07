@@ -9,10 +9,7 @@ import scala.Tuple2;
 import upf.edu.lsds2018.lab4.model.SimplifiedTweet;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Scanner;
 
 public class TwitterBroadcastWithResource {
@@ -31,7 +28,7 @@ public class TwitterBroadcastWithResource {
         final Broadcast<HashMap<String, String>> bcastMap = sparkContext.broadcast(ccToCountry);
 
         // Load input
-        JavaRDD<String> stringRDD = sparkContext.textFile(inputDir);
+        JavaRDD<String> stringRDD = sparkContext.textFile(inputDir).filter(x -> !x.isEmpty());
         JavaRDD<SimplifiedTweet> tweets = stringRDD.map(t -> SimplifiedTweet.fromJson(t).orElse(null)).filter(t -> t != null);
 
         // Retrieve and use the broadcasted map
